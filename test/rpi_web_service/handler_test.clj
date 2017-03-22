@@ -42,7 +42,7 @@
       (is (.contains (get-in response [:headers "Content-Type"]) content-type-expected))
       (is (= (parse-string (:body response) true) body-expected))))
 
-  (testing "Command not found route test"
+  (testing "Command not found test"
     (let [response (app (mock/request :put "/invalid-command/on"))]
       (is (= (:status response) 404))))
 
