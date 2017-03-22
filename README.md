@@ -1,6 +1,6 @@
 # rpi-web-service
 
-FIXME
+Web service on raspberry pi
 
 ## Prerequisites
 
