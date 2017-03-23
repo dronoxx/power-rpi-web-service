@@ -4,7 +4,8 @@
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [compojure "1.5.1"]
-                 [ring/ring-json "0.4.0"]]
+                 [ring/ring-json "0.4.0"]
+                 [projector "0.8.0"]]
   :plugins [[lein-ring "0.9.7"]]
   :ring {:handler rpi-web-service.handler/app}
   :profiles

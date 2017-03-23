@@ -2,6 +2,7 @@
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
             [clojure.string :refer [upper-case]]
+            [projector.core :refer [available-commands projector]]
             [ring.util.response :refer [response]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body]]))
 
@@ -9,7 +10,6 @@
 ; VARS
 ;-------------------------------------------------------
 
-(def available-commands [:power :freeze])
 (def not-found-route (route/not-found (response {:message "Not found"})))
 
 ;-------------------------------------------------------
@@ -35,7 +35,7 @@
 
 (defn command-handler
   [command option]
-  (if (some #(= (keyword command) %1) available-commands)
+  (if (some #(= (keyword command) %1) (available-commands))
     (let [response-body {:command command
                          :option  option
                          :status  (commander command option)}]
