@@ -42,6 +42,11 @@
       (is (.contains (get-in response [:headers "Content-Type"]) content-type-expected))
       (is (= (parse-string (:body response) true) body-expected))))
 
+  (testing "Service status test"
+    (let [response (app (mock/request :get "/status"))]
+      (is (.contains (get-in response [:headers "Content-Type"]) content-type-expected))
+      (is (= (:status response) 200))))
+
   (testing "Command not found test"
     (let [response (app (mock/request :put "/invalid-command/on"))]
       (is (= (:status response) 404))))
