@@ -1,6 +1,8 @@
 (defproject projector-rpi-web-service "0.1.0-SNAPSHOT"
   :description "Projector web service on raspberry pi"
   :url "https://github.com/ieer/rpi-web-service"
+  :license {:name "GNU General Public License v3.0"
+            :url  "https://github.com/ieer/projector-rpi-web-service/blob/master/LICENSE"}
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [compojure "1.5.1"]
