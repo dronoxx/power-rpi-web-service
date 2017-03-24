@@ -1,4 +1,4 @@
-(ns rpi-web-service.handler
+(ns projector-rpi-web-service.handler
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
             [clojure.string :refer [upper-case]]

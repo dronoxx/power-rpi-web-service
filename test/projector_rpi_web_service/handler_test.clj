@@ -1,7 +1,7 @@
-(ns rpi-web-service.handler-test
+(ns projector-rpi-web-service.handler-test
   (:require [clojure.test :refer :all]
             [ring.mock.request :as mock]
-            [rpi-web-service.handler :refer :all]
+            [projector-rpi-web-service.handler :refer :all]
             [cheshire.core :refer :all]))
 
 (def response-code-expected 200)
