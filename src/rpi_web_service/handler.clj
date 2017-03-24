@@ -2,22 +2,24 @@
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
             [clojure.string :refer [upper-case]]
-            [projector.core :refer [available-commands projector]]
+            [clojure.core.match :refer [match]]
+            [projector.core :refer [available-commands projector with-device]]
+            [projector.rs232 :refer [create-a-connection]]
             [ring.util.response :refer [response]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body]]))
 
 ;-------------------------------------------------------
 ; VARS
 ;-------------------------------------------------------
-(defn projector-port
-  []
-  "COM1")
-
 (def not-found-route (route/not-found (response {:message "Not found"})))
+
+(defn projector-port [] (or (System/getenv "PROJECTOR_PORT") "/DEV/TTYAMA0"))
+(defn power-minutes [] (or (System/getenv "POWER_MINUTES_TO_WAIT") 5))
+
 (def services [[:projector
                 {:configuration {:port (projector-port)}}]
                [:power
-                {:configuration {}}]])
+                {:configuration {:minutes-to-wait (power-minutes)}}]])
 
 
 ;-------------------------------------------------------
@@ -27,6 +29,7 @@
 (defn- map-values
   [m keys f & args]
   (reduce #(apply update-in %1 [%2] f args) m keys))
+
 
 (defn upper-case-response
   [response]
@@ -39,14 +42,29 @@
     (if (the-ns (symbol (str (name service) ".core"))) "ok")
     (catch Exception e (.getMessage e))))
 
+
 (defn commander
   [command option]
-  "ok")
+  (try
+    (when-let [device (create-a-connection (projector-port))]
+      (let [projector-fn #(with-device device (projector command option))]
+        (match [command option]
+               [:power :on] (do
+                              ;TODO: give power to projector
+                              (projector-fn))
+               [:power :off] (do
+                               (projector-fn)
+                               ;TODO: cut power of projector in n minutes
+                               )
+               :else (projector-fn)))
+      "ok")
+    (catch Exception e (str "error:" (.getMessage e)))))
 
 ;-------------------------------------------------------
 ; WEB HANDLERS
 ;-------------------------------------------------------
 (defn check-availability-handler [] "RPI Device")
+
 
 (defn check-services-status-handler
   [services]
@@ -63,7 +81,7 @@
   (if (some #(= (keyword command) %1) (available-commands))
     (let [response-body {:command command
                          :option  option
-                         :status  (commander command option)}]
+                         :status  (commander (keyword command) (keyword option))}]
       (-> response-body upper-case-response response))
     not-found-route))
 
@@ -73,5 +91,6 @@
            (GET "/status" [] (check-services-status-handler services))
            (PUT "/:command/:option" [command option] (command-handler command option))
            not-found-route)
+
 
 (def app (-> app-routes wrap-json-response wrap-json-body))
