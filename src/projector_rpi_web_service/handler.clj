@@ -14,7 +14,7 @@
 (def not-found-route (route/not-found (response {:message "Not found"})))
 
 (defn projector-port [] (or (System/getenv "PROJECTOR_PORT") "/DEV/TTYAMA0"))
-(defn power-minutes [] (or (System/getenv "POWER_MINUTES_TO_WAIT") 5))
+(defn power-minutes [] (or (System/getenv "POWER_OFF_MINUTES_TO_WAIT") 5))
 
 (def services [[:projector
                 {:configuration {:port (projector-port)}}]
@@ -42,6 +42,12 @@
     (if (the-ns (symbol (str (name service) ".core"))) "ok")
     (catch Exception e (.getMessage e))))
 
+;TODO: Implement power function
+(defn power-projector
+  ([option]
+    (power option 0 :second))
+  ([option time interval]
+    ""))
 
 (defn commander
   [command option]
@@ -50,12 +56,11 @@
       (let [projector-fn #(with-device device (projector command option))]
         (match [command option]
                [:power :on] (do
-                              ;TODO: give power to projector
+                              (power-projector :on)
                               (projector-fn))
                [:power :off] (do
                                (projector-fn)
-                               ;TODO: cut power of projector in n minutes
-                               )
+                               (power-projector :off power-minutes :minute))
                :else (projector-fn)))
       "ok")
     (catch Exception e (str "error:" (.getMessage e)))))
