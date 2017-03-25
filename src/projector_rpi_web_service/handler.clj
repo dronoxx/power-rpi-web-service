@@ -45,9 +45,9 @@
 ;TODO: Implement power function
 (defn power-projector
   ([option]
-    (power option 0 :second))
+    (power-projector option 0 :second))
   ([option time interval]
-    ""))
+    true))
 
 (defn commander
   [command option]
