@@ -6,7 +6,9 @@
             [projector.core :refer [available-commands projector with-device]]
             [projector.rs232 :refer [create-a-connection]]
             [ring.util.response :refer [response]]
-            [ring.middleware.json :refer [wrap-json-response wrap-json-body]]))
+            [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
+            [ring.adapter.jetty :refer [run-jetty]])
+  (:gen-class))
 
 ;-------------------------------------------------------
 ; VARS
@@ -45,9 +47,9 @@
 ;TODO: Implement power function
 (defn power-projector
   ([option]
-    (power-projector option 0 :second))
+   (power-projector option 0 :second))
   ([option time interval]
-    true))
+   true))
 
 (defn commander
   [command option]
@@ -99,3 +101,12 @@
 
 
 (def app (-> app-routes wrap-json-response wrap-json-body))
+
+
+(defn -main [& args]
+  (let [keyworded-args (map keyword args)
+        action (first keyworded-args)
+        web-server (run-jetty app {:port 8080 :join? false})]
+    (cond
+      (= action :start) (.start web-server)
+      (= action :stop) (.stop web-server))))
