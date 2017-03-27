@@ -15,8 +15,8 @@
 ;-------------------------------------------------------
 (def not-found-route (route/not-found (response {:message "Not found"})))
 
-(defn projector-port [] (or (System/getenv "PROJECTOR_PORT") "/DEV/TTYAMA0"))
-(defn power-minutes [] (or (System/getenv "POWER_OFF_MINUTES_TO_WAIT") 5))
+(defn projector-port [] (or (System/getProperty "PROJECTOR_PORT") "/DEV/TTYAMA0"))
+(defn power-minutes [] (or (System/getProperty "POWER_OFF_MINUTES_TO_WAIT") 5))
 
 (def services [[:projector
                 {:configuration {:port (projector-port)}}]
@@ -92,7 +92,6 @@
       (-> response-body upper-case-response response))
     not-found-route))
 
-
 (defroutes app-routes
            (GET "/" [] (check-availability-handler))
            (GET "/status" [] (check-services-status-handler services))
@@ -105,8 +104,5 @@
 
 (defn -main [& args]
   (let [keyworded-args (map keyword args)
-        action (first keyworded-args)
-        web-server (run-jetty app {:port 8080 :join? false})]
-    (cond
-      (= action :start) (.start web-server)
-      (= action :stop) (.stop web-server))))
+        port (or (second args) 8080)]
+    (run-jetty app {:port (Integer. port) :join? false})))
