@@ -57,7 +57,7 @@
                                )
                :else (projector-fn)))
       "ok")
-    (catch Exception e (str "error:" (.getStackTrace e)))))
+    (catch Exception e (str "error:" (.getMessage e)))))
 
 ;-------------------------------------------------------
 ; WEB HANDLERS
