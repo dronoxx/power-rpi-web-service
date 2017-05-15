@@ -12,14 +12,13 @@
 ; VARS
 ;-------------------------------------------------------
 (def not-found-route (route/not-found (response {:message "Not found"})))
-
-(defn projector-port [] (or (System/getenv "PROJECTOR_PORT") "/DEV/TTYAMA0"))
-(defn power-minutes [] (or (System/getenv "POWER_MINUTES_TO_WAIT") 5))
+(def projector-port (or (System/getenv "PROJECTOR_PORT") "/dev/ttyAMA0"))
+(def power-minutes (or (System/getenv "POWER_MINUTES_TO_WAIT") 5))
 
 (def services [[:projector
-                {:configuration {:port (projector-port)}}]
+                {:configuration {:port projector-port}}]
                [:power
-                {:configuration {:minutes-to-wait (power-minutes)}}]])
+                {:configuration {:minutes-to-wait power-minutes}}]])
 
 
 ;-------------------------------------------------------
@@ -46,7 +45,7 @@
 (defn commander
   [command option]
   (try
-    (when-let [device (create-a-connection (projector-port))]
+    (when-let [device (create-a-connection projector-port)]
       (let [projector-fn #(with-device device (projector command option))]
         (match [command option]
                [:power :on] (do
@@ -58,7 +57,7 @@
                                )
                :else (projector-fn)))
       "ok")
-    (catch Exception e (str "error:" (.getMessage e)))))
+    (catch Exception e (str "error:" (.getStackTrace e)))))
 
 ;-------------------------------------------------------
 ; WEB HANDLERS
