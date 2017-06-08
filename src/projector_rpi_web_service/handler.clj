@@ -3,23 +3,26 @@
             [compojure.route :as route]
             [clojure.string :refer [upper-case]]
             [clojure.core.match :refer [match]]
-            [projector.core :refer [available-commands projector with-device]]
+            [projector.core :refer [available-commands projector with-device] :rename {with-device with-projector-device}]
             [projector.rs232 :refer [create-a-connection]]
+            [power.core :refer [power with-device] :rename {with-device with-power-device}]
+            [power.py-relay :refer [make-relay-device]]
             [ring.util.response :refer [response]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body]]))
 
 ;-------------------------------------------------------
 ; VARS
 ;-------------------------------------------------------
-(def not-found-route (route/not-found (response {:message "Not found"})))
-(def projector-port (or (System/getenv "PROJECTOR_PORT") "/dev/ttyAMA0"))
-(def power-minutes (or (System/getenv "POWER_MINUTES_TO_WAIT") 5))
+(def ^:private not-found-route (route/not-found (response {:message "Not found"})))
+(def ^:private projector-port (or (System/getenv "PROJECTOR_PORT") "/dev/ttyAMA0"))
+(def ^:private power-minutes (or (System/getenv "POWER_MINUTES_TO_WAIT") 5))
 
-(def services [[:projector
-                {:configuration {:port projector-port}}]
-               [:power
-                {:configuration {:minutes-to-wait power-minutes}}]])
+(def ^:private services [[:projector
+                          {:configuration {:port projector-port}}]
+                         [:power
+                          {:configuration {:minutes-to-wait power-minutes}}]])
 
+(def ^:private devices {:power (make-relay-device 16)})
 
 ;-------------------------------------------------------
 ; HANDLER OPTIONS
@@ -45,16 +48,17 @@
 (defn commander
   [command option]
   (try
-    (when-let [device (create-a-connection projector-port)]
-      (let [projector-fn #(with-device device (projector command option))]
+    (when-let [projector-device (create-a-connection projector-port)]
+      (let [projector-fn #(with-projector-device projector-device (projector command option))
+            power-fn #(with-power-device (:power devices) (power %1 %2))]
         (match [command option]
                [:power :on] (do
-                              ;TODO: give power to projector
+                              (power-fn 1 :second)
+                              (Thread/sleep 1500)
                               (projector-fn))
                [:power :off] (do
                                (projector-fn)
-                               ;TODO: cut power of projector in n minutes
-                               )
+                               (power-fn power-minutes :minute))
                :else (projector-fn)))
       "ok")
     (catch Exception e (str "error:" (.getMessage e)))))
