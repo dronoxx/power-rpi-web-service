@@ -18,13 +18,14 @@
 (def ^:private not-found-route (route/not-found (response {:message "Not found"})))
 (def ^:private projector-port (or (System/getenv "PROJECTOR_PORT") "/dev/ttyAMA0"))
 (def ^:private power-minutes (or (System/getenv "POWER_MINUTES_TO_WAIT") 2))
+(def ^:private power-device-pin (or (System/getenv "POWER_DEVICE_PIN") 6))
 
 (def ^:private services [[:projector
                           {:configuration {:port projector-port}}]
                          [:power
                           {:configuration {:minutes-to-wait power-minutes}}]])
 
-(def ^:private devices {:power (make-relay-device 6)})
+(def ^:private devices {:power (make-relay-device power-device-pin)})
 
 ;-------------------------------------------------------
 ; HANDLER OPTIONS
@@ -51,16 +52,15 @@
   [command option]
   (try
     (when-let [projector-device (create-a-connection projector-port)]
-      (let [projector-fn #(with-projector-device projector-device (projector command option))
-            power-fn #(with-power-device (:power devices) (power option %1 %2))]
+      (let [projector-fn #(with-projector-device projector-device (projector command option))]
         (match [command option]
-               [:power :on] (do
-                              (power-fn 1 :second)
+               [:power :on] (future
+                              (with-power-device (:power devices) (power option))
                               (Thread/sleep 1500)
                               (projector-fn))
-               [:power :off] (do
+               [:power :off] (future
                                (projector-fn)
-                               (power-fn power-minutes :minute))
+                               (with-power-device (:power devices) (power option power-minutes :minute)))
                :else (projector-fn)))
       "ok")
     (catch Exception e (str "error:" (.getMessage e)))))
