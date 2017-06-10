@@ -1,0 +1,12 @@
+[Unit]
+Description=Device Indicator LED
+
+[Service]
+ExecStart=/usr/bin/python /usr/local/bin/device_on.py 12 ON
+ExecStop=/usr/bin/python /usr/local/bin/device_on.py 12 OFF
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
