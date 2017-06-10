@@ -8,7 +8,8 @@
             [power.core :refer [power with-device] :rename {with-device with-power-device}]
             [power.py-relay :refer [make-relay-device]]
             [ring.util.response :refer [response]]
-            [ring.middleware.json :refer [wrap-json-response wrap-json-body]])
+            [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
+            [ring.adapter.jetty :refer [run-jetty]])
   (:gen-class))
 
 ;-------------------------------------------------------
