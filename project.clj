@@ -12,6 +12,12 @@
                  [power "0.1.0"]
                  [ring/ring-jetty-adapter "1.5.1"]]
   :plugins [[lein-ring "0.9.7"]]
+  :repl-options {
+                 ;; If nREPL takes too long to load it may timeout,
+                 ;; increase this to wait longer before timing out.
+                 ;; Defaults to 30000 (30 seconds)
+                 :timeout 120000
+                 }
   :ring {:handler projector-rpi-web-service.handler/app}
   :main projector-rpi-web-service.handler
   :profiles {
