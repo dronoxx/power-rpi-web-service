@@ -12,6 +12,8 @@
                  [power "0.1.0"]]
   :plugins [[lein-ring "0.9.7"]]
   :ring {:handler projector-rpi-web-service.handler/app}
-  :profiles
-  {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
-                        [ring/ring-mock "0.3.0"]]}})
+  :main projector-rpi-web-service.handler
+  :profiles {
+             :uberjar {:aot :all}
+             :dev     {:dependencies [[javax.servlet/servlet-api "2.5"]
+                                      [ring/ring-mock "0.3.0"]]}})

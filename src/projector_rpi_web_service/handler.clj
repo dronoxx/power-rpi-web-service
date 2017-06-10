@@ -8,21 +8,22 @@
             [power.core :refer [power with-device] :rename {with-device with-power-device}]
             [power.py-relay :refer [make-relay-device]]
             [ring.util.response :refer [response]]
-            [ring.middleware.json :refer [wrap-json-response wrap-json-body]]))
+            [ring.middleware.json :refer [wrap-json-response wrap-json-body]])
+  (:gen-class))
 
 ;-------------------------------------------------------
 ; VARS
 ;-------------------------------------------------------
 (def ^:private not-found-route (route/not-found (response {:message "Not found"})))
 (def ^:private projector-port (or (System/getenv "PROJECTOR_PORT") "/dev/ttyAMA0"))
-(def ^:private power-minutes (or (System/getenv "POWER_MINUTES_TO_WAIT") 5))
+(def ^:private power-minutes (or (System/getenv "POWER_MINUTES_TO_WAIT") 2))
 
 (def ^:private services [[:projector
                           {:configuration {:port projector-port}}]
                          [:power
                           {:configuration {:minutes-to-wait power-minutes}}]])
 
-(def ^:private devices {:power (make-relay-device 16)})
+(def ^:private devices {:power (make-relay-device 6)})
 
 ;-------------------------------------------------------
 ; HANDLER OPTIONS
@@ -50,7 +51,7 @@
   (try
     (when-let [projector-device (create-a-connection projector-port)]
       (let [projector-fn #(with-projector-device projector-device (projector command option))
-            power-fn #(with-power-device (:power devices) (power %1 %2))]
+            power-fn #(with-power-device (:power devices) (power option %1 %2))]
         (match [command option]
                [:power :on] (do
                               (power-fn 1 :second)
@@ -97,3 +98,8 @@
 
 
 (def app (-> app-routes wrap-json-response wrap-json-body))
+
+(defn -main [& args]
+  (let [port (Integer. (first args))]
+    (do
+      (run-jetty app {:port port :join? false}))))
