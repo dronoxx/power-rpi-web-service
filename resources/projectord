@@ -1,0 +1,13 @@
+#!/bin/bash
+
+source /etc/projector.conf
+
+/usr/local/bin/ledindicator 20 ON
+
+java -jar \
+-DPROJECTOR_PORT=$PROJECTOR_SERIAL_PORT \
+-DPOWER_MINUTES_TO_WAIT=$MINUTE_TO_WAIT \
+-DPOWER_DEVICE_PIN=$POWER_DEVICE_PIN \
+/usr/local/sbin/projectord.jar "$PROJECTOR_PORT"
+
+/usr/local/bin/ledindicator 20 OFF
