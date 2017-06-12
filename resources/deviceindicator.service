@@ -2,11 +2,13 @@
 Description=Device Indicator LED
 
 [Service]
-ExecStart=/usr/bin/python /usr/local/bin/device_on.py 12 ON
-ExecStop=/usr/bin/python /usr/local/bin/device_on.py 12 OFF
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/ledindicator 12 ON
+ExecStop=/usr/local/bin/ledindicator 12 OFF
 ExecReload=/bin/kill -HUP $MAINPID
 KillMode=process
-Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
+
