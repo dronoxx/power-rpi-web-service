@@ -1,11 +1,11 @@
 [Unit]
-Description=Projector web service
+Description=Power web service
 Wants=network-online.target
 After=network.target network-online.target
 
 [Service]
 Type=forking
-ExecStart=/usr/local/sbin/projectord &
+ExecStart=/usr/local/sbin/powerwsd &
 ExecStop=/bin/kill -HUP $MAINPID
 ExecReload=/bin/kill -HUP $MAINPID
 KillMode=process

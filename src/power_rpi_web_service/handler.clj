@@ -1,10 +1,8 @@
-(ns projector-rpi-web-service.handler
+(ns power-rpi-web-service.handler
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
             [clojure.string :refer [upper-case]]
             [clojure.core.match :refer [match]]
-            [projector.core :refer [available-commands projector with-device] :rename {with-device with-projector-device}]
-            [projector.rs232 :refer [create-a-connection]]
             [power.core :refer [power with-device] :rename {with-device with-power-device}]
             [power.py-relay :refer [make-relay-device]]
             [ring.util.response :refer [response]]
@@ -16,14 +14,13 @@
 ; VARS
 ;-------------------------------------------------------
 (def ^:private not-found-route (route/not-found (response {:message "Not found"})))
-(def ^:private projector-port (or (System/getenv "PROJECTOR_PORT") "/dev/ttyAMA0"))
-(def ^:private power-minutes (or (System/getenv "POWER_MINUTES_TO_WAIT") 2))
+(def ^:private time-power-on (or (System/getenv "TIME_POWER_ON") "20:00"))
+(def ^:private power-hours (or (System/getenv "POWER_HOUR_TO_WAIT") 2))
 (def ^:private power-device-pin (or (System/getenv "POWER_DEVICE_PIN") 6))
 
-(def ^:private services [[:projector
-                          {:configuration {:port projector-port}}]
-                         [:power
-                          {:configuration {:minutes-to-wait power-minutes}}]])
+(def ^:private services [[:power
+                          {:configuration {:time-power-on time-power-on
+                                           :hours-to-wait power-hours}}]])
 
 (def ^:private devices {:power (make-relay-device power-device-pin)})
 
@@ -48,21 +45,11 @@
     (catch Exception e (.getMessage e))))
 
 
-(defn commander
-  [command option]
+(defn power-devices
+  [option]
   (try
-    (when-let [projector-device (create-a-connection projector-port)]
-      (let [projector-fn #(with-projector-device projector-device (projector command option))]
-        (match [command option]
-               [:power :on] (future
-                              (with-power-device (:power devices) (power option))
-                              (Thread/sleep 1500)
-                              (projector-fn))
-               [:power :off] (future
-                               (projector-fn)
-                               (with-power-device (:power devices) (power option power-minutes :minute)))
-               :else (projector-fn)))
-      "ok")
+    (with-power-device (:power devices) (power option))
+    "ok"
     (catch Exception e (str "error:" (.getMessage e)))))
 
 ;-------------------------------------------------------
@@ -81,20 +68,18 @@
     (response service-map)))
 
 
-(defn command-handler
-  [command option]
-  (if (some #(= (keyword command) %1) (available-commands))
-    (let [response-body {:command command
-                         :option  option
-                         :status  (commander (keyword command) (keyword option))}]
-      (-> response-body upper-case-response response))
-    not-found-route))
+(defn power-handler
+  [option]
+  (let [response-body {:command "power"
+                       :option  option
+                       :status  (power-devices (keyword option))}]
+    (-> response-body upper-case-response response)))
 
 
 (defroutes app-routes
            (GET "/" [] (check-availability-handler))
            (GET "/status" [] (check-services-status-handler services))
-           (PUT "/:command/:option" [command option] (command-handler command option))
+           (PUT "/power/:option" [option] (power-handler option))
            not-found-route)
 
 

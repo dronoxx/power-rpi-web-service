@@ -1,8 +1,8 @@
 [![Build Status](https://travis-ci.org/ieer/projector-rpi-web-service.svg?branch=master)](https://travis-ci.org/ieer/projector-rpi-web-service)
 
-# Projector rpi Web service
+# Power rpi Web service
 
-Projector web service on raspberry pi
+Power web service on raspberry pi
 
 ## Prerequisites
 

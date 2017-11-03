@@ -1,0 +1,13 @@
+#!/bin/bash
+
+source /etc/power-web-service.conf
+
+/usr/local/bin/ledindicator 20 ON
+
+java -jar \
+-DTIME_POWER_ON=$TIME_POWER_ON \
+-DPOWER_HOUR_TO_WAIT=$HOUR_TO_WAIT \
+-DPOWER_DEVICE_PIN=$POWER_DEVICE_PIN \
+/usr/local/sbin/powerwsd.jar "$PROJECTOR_PORT"
+
+/usr/local/bin/ledindicator 20 OFF
