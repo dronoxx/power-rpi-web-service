@@ -33,19 +33,19 @@
   (reduce #(apply update-in %1 [%2] f args) m keys))
 
 
-(defn upper-case-response
+(defn- upper-case-response
   [response]
   (map-values response [:command :option :status] upper-case))
 
 
-(defn service-status
+(defn- service-status
   [service]
   (try
     (if (the-ns (symbol (str (name service) ".core"))) "ok")
     (catch Exception e (.getMessage e))))
 
 
-(defn power-devices
+(defn- power-devices
   [option]
   (try
     (with-power-device (:power devices) (power option))
@@ -55,10 +55,10 @@
 ;-------------------------------------------------------
 ; WEB HANDLERS
 ;-------------------------------------------------------
-(defn check-availability-handler [] "RPI Device")
+(defn- check-availability-handler [] "RPI Device")
 
 
-(defn check-services-status-handler
+(defn- check-services-status-handler
   [services]
   (let [service-map (map #(hash-map
                             (keyword (str (first %1) "-service"))
@@ -68,7 +68,7 @@
     (response service-map)))
 
 
-(defn power-handler
+(defn- power-handler
   [option]
   (let [response-body {:command "power"
                        :option  option
