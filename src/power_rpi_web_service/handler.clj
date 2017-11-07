@@ -18,6 +18,7 @@
 (def ^:private not-found-route (route/not-found (response {:message "Not found"})))
 (def ^:private time-power-on (or (System/getenv "TIME_POWER_ON") "20:00"))
 (def ^:private time-power-off (or (System/getenv "TIME_POWER_OFF") ""))
+(def ^:private time-to-check-task (or (System/getenv "TIME_TO_CHECK_TASK") 15))
 (def ^:private power-device-pin (or (System/getenv "POWER_DEVICE_PIN") 6))
 
 (def ^:private services [[:power
@@ -30,7 +31,8 @@
 ; HANDLER OPTIONS
 ;-------------------------------------------------------
 
-(defn- current-time []
+(defn- current-time
+  []
   (let [now (LocalDateTime/now)
         hour (.getHour now)
         minute (.getMinute now)]
@@ -60,20 +62,19 @@
     "ok"
     (catch Exception e (str "error:" (.getMessage e)))))
 
-(defn- power-device-task
-  [time-to-power option]
-  (let [time (current-time)
-        hour-minute (second time)
-        str-time (str (first hour-minute) ":" (second hour-minute))]
-    (if (= time-to-power str-time)
-      (with-power-device (:power devices) (power option)))))
 
-(defn- power-devices-tasks
-  [time-power-on time-power-off]
-  (do
-    (run {:pause 900000} (power-device-task time-power-on :on))
-    (if (seq time-power-off)
-      (run {:pause 900000} (power-device-task time-power-off :off)))))
+(defn- power-devices-task
+  [time-pause-minute time-power-on time-power-off]
+  (let [pause-time (* 1000 60 time-pause-minute)
+        task-fn #(let [now (current-time)
+                       hour-minute (second now)
+                       str-time (str (first hour-minute) ":" (second hour-minute))]
+                   (if (= %1 str-time)
+                     (with-power-device (:power devices) (power %2))))]
+    (do
+      (run {:pause pause-time} (task-fn time-power-on :on))
+      (if (seq time-power-off)
+        (run {:pause pause-time} (task-fn time-power-off :off))))))
 
 ;-------------------------------------------------------
 ; WEB HANDLERS
@@ -111,5 +112,5 @@
 (defn -main [& args]
   (let [port (Integer. (first args))]
     (do
-      (power-devices-tasks time-power-on time-power-off)
+      (power-devices-task time-to-check-task time-power-on time-power-off)
       (run-jetty app {:port port :join? false}))))
