@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ieer/projector-rpi-web-service.svg?branch=master)](https://travis-ci.org/ieer/projector-rpi-web-service)
+[![Build Status](https://travis-ci.org/xerp/power-rpi-web-service.svg?branch=master)](https://travis-ci.org/xerp/power-rpi-web-service)
 
 # Power rpi Web service
 
