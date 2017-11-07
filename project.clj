@@ -1,4 +1,4 @@
-(defproject power-rpi-web-service "0.1.0-SNAPSHOT"
+(defproject power-rpi-web-service "1.1-SNAPSHOT"
   :description "Web service for raspberry pi to power devices"
   :url "https://github.com/ieer/rpi-web-service"
   :license {:name "GNU General Public License v3.0"

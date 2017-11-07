@@ -1,4 +1,8 @@
-(ns power-rpi-web-service.handler
+(ns
+  ^{:doc "Main handler for the power web service"
+    :author "Santiago de Pedro"
+    :added "1.0"}
+  power-rpi-web-service.handler
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
             [clojure.string :refer [upper-case]]
@@ -32,6 +36,9 @@
 ;-------------------------------------------------------
 
 (defn- current-time
+  "Returns the current time"
+  ^{:author "Santiago de Pedro"
+    :added "1.1"}
   []
   (let [now (LocalDateTime/now)
         hour (.getHour now)
@@ -39,16 +46,25 @@
     [now [hour minute]]))
 
 (defn- map-values
+  "Applies the f to the keys and create a map for these"
+  ^{:author "Santiago de Pedro"
+    :added "1.0"}
   [m keys f & args]
   (reduce #(apply update-in %1 [%2] f args) m keys))
 
 
 (defn- upper-case-response
+  "Convert to upper case all response values"
+  ^{:author "Santiago de Pedro"
+    :added "1.0"}
   [response]
   (map-values response [:command :option :status] upper-case))
 
 
 (defn- service-status
+  "Returns the status of a service"
+  ^{:author "Santiago de Pedro"
+    :added "1.0"}
   [service]
   (try
     (if (the-ns (symbol (str (name service) ".core"))) "ok")
@@ -56,6 +72,9 @@
 
 
 (defn- power-devices
+  "Power the device with a specific option"
+  ^{:author "Santiago de Pedro"
+    :added "1.0"}
   [option]
   (try
     (with-power-device (:power devices) (power option))
@@ -64,6 +83,9 @@
 
 
 (defn- power-devices-task
+  "Task for power device at specific time"
+  ^{:author "Santiago de Pedro"
+    :added "1.1"}
   [time-pause-minute time-power-on time-power-off]
   (let [pause-time (* 1000 60 time-pause-minute)
         task-fn #(let [now (current-time)
