@@ -68,6 +68,13 @@
     (if (= time-to-power str-time)
       (with-power-device (:power devices) (power option)))))
 
+(defn- power-devices-tasks
+  [time-power-on time-power-off]
+  (do
+    (run {:pause 900000} (power-device-task time-power-on :on))
+    (if (seq time-power-off)
+      (run {:pause 900000} (power-device-task time-power-off :off)))))
+
 ;-------------------------------------------------------
 ; WEB HANDLERS
 ;-------------------------------------------------------
@@ -104,6 +111,5 @@
 (defn -main [& args]
   (let [port (Integer. (first args))]
     (do
-      (run {:pause 900000} (power-device-task time-power-on :on))
-      (run {:pause 900000} (power-device-task time-power-off :off))
+      (power-devices-tasks time-power-on time-power-off)
       (run-jetty app {:port port :join? false}))))
