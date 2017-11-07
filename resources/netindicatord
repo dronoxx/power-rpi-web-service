@@ -1,0 +1,31 @@
+#!/bin/bash
+
+source /etc/power-web-service.conf
+
+# Function to return network device status
+function device_status(){
+    file=/sys/class/net/$1
+    value=$(grep "$1/operstate:*" $file)
+    return $(cut -d":" -f2 $value)
+}
+
+# Function that check status of network devices, if is up, turn on a led
+function check_network_devices(){
+    lan_dev='eth0'
+    wifi_dev='wlan0'
+    connect_status='up'
+
+    if [ $(device_status $lan_dev) == $connect_status ] || [ $(device_status $wifi_dev) == $connect_status ]; then
+        ledindicator $LAN_INDICATOR_LED ON
+    else
+        ledindicator $LAN_INDICATOR_LED OFF
+    fi
+}
+
+
+while true
+do
+    check_network_devices
+done
+
+

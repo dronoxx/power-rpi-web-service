@@ -4,8 +4,9 @@ Description=Device Indicator LED
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/local/bin/ledindicator 12 ON
-ExecStop=/usr/local/bin/ledindicator 12 OFF
+EnvironmentFile=/etc/power-web-service.conf
+ExecStart=ledindicator $DEVICE_INDICATOR_LED ON
+ExecStop=ledindicator $DEVICE_INDICATOR_LED OFF
 ExecReload=/bin/kill -HUP $MAINPID
 KillMode=process
 

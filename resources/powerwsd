@@ -2,7 +2,7 @@
 
 source /etc/power-web-service.conf
 
-/usr/local/bin/ledindicator 20 ON
+ledindicator $WEB_SERVICE_INDICATOR_LED ON
 
 java -jar \
 -DTIME_POWER_ON=$TIME_POWER_ON \
@@ -11,4 +11,4 @@ java -jar \
 -DPOWER_DEVICE_PIN=$POWER_DEVICE_PIN \
 /usr/local/sbin/powerwsd.jar "$PROJECTOR_PORT"
 
-/usr/local/bin/ledindicator 20 OFF
+ledindicator $WEB_SERVICE_INDICATOR_LED OFF
