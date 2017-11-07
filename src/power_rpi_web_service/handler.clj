@@ -15,12 +15,12 @@
 ;-------------------------------------------------------
 (def ^:private not-found-route (route/not-found (response {:message "Not found"})))
 (def ^:private time-power-on (or (System/getenv "TIME_POWER_ON") "20:00"))
-(def ^:private power-hours (or (System/getenv "POWER_HOUR_TO_WAIT") 2))
+(def ^:private time-power-off (or (System/getenv "TIME_POWER_OFF") ""))
 (def ^:private power-device-pin (or (System/getenv "POWER_DEVICE_PIN") 6))
 
 (def ^:private services [[:power
                           {:configuration {:time-power-on time-power-on
-                                           :hours-to-wait power-hours}}]])
+                                           :hours-to-wait time-power-off}}]])
 
 (def ^:private devices {:power (make-relay-device power-device-pin)})
 
