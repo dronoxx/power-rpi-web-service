@@ -9,6 +9,7 @@
                  [ring/ring-json "0.4.0"]
                  [org.clojure/core.match "0.2.2"]
                  [power "0.4.0"]
+                 [net.mikera/task "0.1.0"]
                  [ring/ring-jetty-adapter "1.5.1"]]
   :plugins [[lein-ring "0.9.7"]]
   :repl-options {:timeout 120000}

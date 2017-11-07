@@ -7,8 +7,10 @@
             [power.py-relay :refer [make-relay-device]]
             [ring.util.response :refer [response]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
-            [ring.adapter.jetty :refer [run-jetty]])
-  (:gen-class))
+            [ring.adapter.jetty :refer [run-jetty]]
+            [task.core :refer [run]])
+  (:gen-class)
+  (:import (java.time LocalDateTime)))
 
 ;-------------------------------------------------------
 ; VARS
@@ -27,6 +29,12 @@
 ;-------------------------------------------------------
 ; HANDLER OPTIONS
 ;-------------------------------------------------------
+
+(defn- current-time []
+  (let [now (LocalDateTime/now)
+        hour (.getHour now)
+        minute (.getMinute now)]
+    [now [hour minute]]))
 
 (defn- map-values
   [m keys f & args]
@@ -51,6 +59,14 @@
     (with-power-device (:power devices) (power option))
     "ok"
     (catch Exception e (str "error:" (.getMessage e)))))
+
+(defn- power-device-task
+  [time-to-power option]
+  (let [time (current-time)
+        hour-minute (second time)
+        str-time (str (first hour-minute) ":" (second hour-minute))]
+    (if (= time-to-power str-time)
+      (with-power-device (:power devices) (power option)))))
 
 ;-------------------------------------------------------
 ; WEB HANDLERS
@@ -88,4 +104,6 @@
 (defn -main [& args]
   (let [port (Integer. (first args))]
     (do
+      (run {:pause 900000} (power-device-task time-power-on :on))
+      (run {:pause 900000} (power-device-task time-power-off :off))
       (run-jetty app {:port port :join? false}))))
