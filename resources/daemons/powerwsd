@@ -9,6 +9,6 @@ java -jar \
 -DTIME_POWER_OFF=$TIME_POWER_OFF \
 -DTIME_TO_CHECK_TASK=$TIME_TO_CHECK_TASK \
 -DPOWER_DEVICE_PIN=$POWER_DEVICE_PIN \
-/usr/local/sbin/powerwsd.jar "$PROJECTOR_PORT"
+/usr/local/sbin/powerwsd.jar
 
 ledindicator $WEB_SERVICE_INDICATOR_LED OFF

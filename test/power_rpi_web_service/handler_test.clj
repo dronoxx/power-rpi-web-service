@@ -1,7 +1,7 @@
 (ns power-rpi-web-service.handler-test
   (:require [clojure.test :refer :all]
             [ring.mock.request :as mock]
-            [power-rpi-web-service.handler :refer :all]
+            [power-rpi-web-service.api :refer :all]
             [cheshire.core :refer :all]))
 
 (def response-code-expected 200)
