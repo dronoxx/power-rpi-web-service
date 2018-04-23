@@ -1,0 +1,4 @@
+{:devices  [{:type       :power
+             :device-pin #or [#env POWER_DEVICE_PIN 6]}]
+ :services [{:type          :power
+             :configuration {}}]}

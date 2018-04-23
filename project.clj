@@ -5,16 +5,15 @@
             :url  "https://github.com/xerp/power-rpi-web-service/blob/master/LICENSE"}
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.8.0"]
-                 [compojure "1.5.1"]
-                 [ring/ring-json "0.4.0"]
-                 [org.clojure/core.match "0.2.2"]
+                 [aero "1.1.3"]
                  [power "0.4.0"]
-                 [net.mikera/task "0.1.0"]
-                 [ring/ring-jetty-adapter "1.5.1"]]
+                 [compojure "1.6.1"]
+                 [ring/ring-jetty-adapter "1.5.1"]
+                 [ring/ring-json "0.4.0"]
+                 [ch.qos.logback/logback-classic "1.2.3"]]
   :plugins [[lein-ring "0.9.7"]]
   :repl-options {:timeout 120000}
-  :ring {:handler power-rpi-web-service.handler/app}
-  :main power-rpi-web-service.handler
+  :ring {:handler power-rpi-web-service.api/app}
   :profiles {
              :uberjar {:aot :all}
              :dev     {:dependencies [[javax.servlet/servlet-api "2.5"]
