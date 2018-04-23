@@ -12,7 +12,7 @@
                  [ring/ring-json "0.4.0"]]
   :plugins [[lein-ring "0.9.7"]]
   :repl-options {:timeout 120000}
-  :ring {:handler power-rpi-web-service.handler/api}
+  :ring {:handler power-rpi-web-service.api/app}
   :profiles {
              :uberjar {:aot :all}
              :dev     {:dependencies [[javax.servlet/servlet-api "2.5"]

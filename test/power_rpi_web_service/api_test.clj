@@ -1,4 +1,4 @@
-(ns power-rpi-web-service.handler-test
+(ns power-rpi-web-service.api-test
   (:require [clojure.test :refer :all]
             [ring.mock.request :as mock]
             [power-rpi-web-service.api :refer :all]
