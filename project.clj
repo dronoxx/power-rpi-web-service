@@ -9,7 +9,8 @@
                  [power "0.4.0"]
                  [compojure "1.6.1"]
                  [ring/ring-jetty-adapter "1.5.1"]
-                 [ring/ring-json "0.4.0"]]
+                 [ring/ring-json "0.4.0"]
+                 [ch.qos.logback/logback-classic "1.2.3"]]
   :plugins [[lein-ring "0.9.7"]]
   :repl-options {:timeout 120000}
   :ring {:handler power-rpi-web-service.api/app}
