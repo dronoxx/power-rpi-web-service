@@ -4,11 +4,6 @@ source /etc/power-web-service.conf
 
 ledindicator $WEB_SERVICE_INDICATOR_LED ON
 
-java -jar \
--DTIME_POWER_ON=$TIME_POWER_ON \
--DTIME_POWER_OFF=$TIME_POWER_OFF \
--DTIME_TO_CHECK_TASK=$TIME_TO_CHECK_TASK \
--DPOWER_DEVICE_PIN=$POWER_DEVICE_PIN \
-/usr/local/sbin/powerwsd.jar
+java -jar -DPOWER_DEVICE_PIN=$POWER_DEVICE_PIN /usr/local/sbin/powerwsd.jar
 
 ledindicator $WEB_SERVICE_INDICATOR_LED OFF
